@@ -1,0 +1,12 @@
+[package]
+name = "sherr"
+version = "0.1.0"
+authors = ["Artem Shein <artem.shein@aisys.ru>"]
+
+description = "Error handling helpers"
+repository = "https://github.com/artemshein/sherr"
+categories = ["development-tools"]
+license = "MIT"
+
+[dependencies]
+log = "0.4"
