@@ -11,3 +11,13 @@ fn diag_unreachable() {
 fn diag_unimplemented() {
     diag_unimplemented!()
 }
+
+#[cfg(feature = "impl")]
+#[test]
+fn logger() {
+    init_logger().apply().unwrap();
+    diag!("To file");
+    debug!("Hidden");
+    info!("Info");
+    error!("Error");
+}

@@ -3,10 +3,16 @@ name = "sherr"
 version = "0.1.0"
 authors = ["Artem Shein <artem.shein@aisys.ru>"]
 
-description = "Error handling helpers"
+description = "Error handling and logging helpers"
 repository = "https://github.com/artemshein/sherr"
 categories = ["development-tools"]
 license = "MIT"
 
 [dependencies]
 log = "0.4"
+fern = { version = "0.5", features = ["colored"], optional = true }
+chrono = { version = "0.4", optional = true }
+
+[features]
+default = []
+impl = ["fern", "chrono"]
