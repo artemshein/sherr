@@ -4,9 +4,18 @@ pub extern crate log;
 pub extern crate chrono;
 #[cfg(feature = "impl")]
 pub extern crate fern;
+#[cfg(feature = "fail")]
+pub extern crate failure;
+#[cfg(feature = "fail")]
+#[macro_use]
+pub extern crate failure_derive;
 
 pub use log::*;
 
+#[cfg(feature = "fail")]
+pub use failure_derive::*;
+
+#[derive(Debug)]
 pub struct Position {
     pub file: &'static str,
     pub line: u32,
@@ -19,9 +28,25 @@ impl std::fmt::Display for Position {
     }
 }
 
+#[derive(Debug)]
+#[cfg_attr(feature = "fail", derive(Fail))]
 pub enum DiagError {
-    UnreachableCodeReached(Position),
-    Unimplemented(Position),
+    #[cfg_attr(feature = "fail", fail(display = "unreachable code reached at {}", pos))]
+    UnreachableCodeReached { pos: Position },
+    #[cfg_attr(feature = "fail", fail(display = "unimplemented code reached at {}", pos))]
+    UnimplementedCodeReached { pos: Position },
+}
+
+impl DiagError {
+
+    pub fn unimplemented(pos: Position) -> Self {
+        DiagError::UnimplementedCodeReached { pos }
+    }
+
+    pub fn unreachable(pos: Position) -> Self {
+        DiagError::UnreachableCodeReached { pos }
+    }
+
 }
 
 #[macro_export]
@@ -56,11 +81,11 @@ macro_rules! diag_unreachable {
 macro_rules! diag_unreachable_err {
     () => {{
         diag_unreachable!();
-        return Err(::DiagError::UnreachableCodeReached(diag_position!()).into());
+        return Err(::DiagError::UnreachableCodeReached { pos: diag_position!() }.into());
     }};
     ($($arg:tt)+) => {{
         diag_unreachable!($($arg)*);
-        return Err(::DiagError::UnreachableCodeReached(diag_position!()).into());
+        return Err(::DiagError::UnreachableCodeReached { pos: diag_position!() }.into());
     }}
 }
 
@@ -80,11 +105,11 @@ macro_rules! diag_unimplemented {
 macro_rules! diag_unimplemented_err {
     () => {{
         diag_unreachable!();
-        return Err(::DiagError::Unimplemented(diag_position!()).into());
+        return Err(::DiagError::Unimplemented { pos: diag_position!() }.into());
     }};
     ($($arg:tt)+) => {{
         diag_unreachable!($($arg)*);
-        return Err(::DiagError::Unimplemented(diag_position!()).into());
+        return Err(::DiagError::Unimplemented { pos: diag_position!() }.into());
     }}
 }
 
@@ -133,25 +158,29 @@ pub fn diag_dispatch() -> fern::Dispatch {
                 message,
             ))
         })
+        .level(log::LevelFilter::Info)
         .level_for("diagnostics", log::LevelFilter::Trace)
 }
 
 #[cfg(feature = "impl")]
-pub fn init_logger() -> fern::Dispatch {
+pub fn init_logger(log_file: Option<impl AsRef<std::path::Path>>) -> std::io::Result<fern::Dispatch> {
     let mut dispatch = fern::Dispatch::new().chain(stdout_dispatch().chain(std::io::stdout()));
-    if let Ok(exe_path) = std::env::current_exe() {
-        if let Some(exe_dir) = exe_path.parent() {
-            if let Ok(log_file) = std::fs::OpenOptions::new()
-                .write(true)
-                .create(true)
-                .truncate(true)
-                .open(exe_dir.join(".diag.log"))
-            {
-                dispatch = dispatch.chain(diag_dispatch().chain(log_file))
-            }
-        }
+    let log_file = if let Some(log_file) = log_file {
+        Some(log_file.as_ref().to_owned())
+    } else if let Ok(exe_path) = std::env::current_exe() {
+        exe_path.parent().map(|exe_dir| exe_dir.join(".diag.log"))
+    } else {
+        None
+    };
+    if let Some(log_file) = log_file {
+        let log_file = std::fs::OpenOptions::new()
+            .write(true)
+            .create(true)
+            .truncate(true)
+            .open(log_file)?;
+        dispatch = dispatch.chain(diag_dispatch().chain(log_file))
     }
-    dispatch
+    Ok(dispatch)
 }
 
 #[cfg(test)]

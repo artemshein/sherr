@@ -1,6 +1,6 @@
 [package]
 name = "sherr"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Artem Shein <artem.shein@aisys.ru>"]
 
 description = "Error handling and logging helpers"
@@ -12,7 +12,10 @@ license = "MIT"
 log = "0.4"
 fern = { version = "0.5", features = ["colored"], optional = true }
 chrono = { version = "0.4", optional = true }
+failure = { version = "0.1", optional = true }
+failure_derive = { version = "0.1", optional = true }
 
 [features]
 default = []
 impl = ["fern", "chrono"]
+fail = ["failure", "failure_derive"]

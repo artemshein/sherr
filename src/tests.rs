@@ -14,10 +14,18 @@ fn diag_unimplemented() {
 
 #[cfg(feature = "impl")]
 #[test]
-fn logger() {
-    init_logger().apply().unwrap();
+fn logger() -> std::io::Result<()> {
+    init_logger(".test.log".into())?.apply().unwrap();
     diag!("To file");
     debug!("Hidden");
     info!("Info");
     error!("Error");
+    Ok(())
+}
+
+#[cfg(feature = "fail")]
+#[test]
+fn failure() {
+    let e: failure::Error = DiagError::unimplemented(diag_position!()).into();
+    error!("{}", e);
 }
