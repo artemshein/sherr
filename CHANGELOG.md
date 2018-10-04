@@ -1,3 +1,8 @@
+0.2.3
+=====
+
+* Fixed few more macro name resolution problems
+
 0.2.2
 =====
 

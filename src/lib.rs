@@ -59,7 +59,7 @@ impl DiagError {
 #[macro_export]
 macro_rules! diag_position {
     () => {{
-        Position {
+        self::Position {
             file: file!(),
             line: line!(),
             column: column!(),
@@ -77,11 +77,11 @@ macro_rules! diag {
 macro_rules! diag_err {
     () => {{
         diag!("internal error at {}", diag_position!());
-        ::failure::Error::from(self::DiagError::InternalError { pos: diag_position!() })
+        self::failure::Error::from(self::DiagError::InternalError { pos: diag_position!() })
     }};
     ($($arg:tt)+) => {{
         diag!($($arg)*);
-        ::failure::Error::from(self::DiagError::InternalError { pos: diag_position!() })
+        self::failure::Error::from(self::DiagError::InternalError { pos: diag_position!() })
     }}
 }
 
@@ -94,7 +94,7 @@ macro_rules! diag_err {
     }};
     ($($arg:tt)+) => {{
         diag!($($arg)*);
-        ::DiagError::InternalError { pos: diag_position!() }
+        self::DiagError::InternalError { pos: diag_position!() }
     }}
 }
 
@@ -114,11 +114,11 @@ macro_rules! diag_unreachable {
 macro_rules! diag_unreachable_err {
     () => {{
         diag_unreachable!();
-        return Err(::DiagError::UnreachableCodeReached { pos: diag_position!() }.into());
+        return self::failure::Err(self::DiagError::UnreachableCodeReached { pos: diag_position!() }.into());
     }};
     ($($arg:tt)+) => {{
         diag_unreachable!($($arg)*);
-        return Err(::DiagError::UnreachableCodeReached { pos: diag_position!() }.into());
+        return self::failure::Err(self::DiagError::UnreachableCodeReached { pos: diag_position!() }.into());
     }}
 }
 
