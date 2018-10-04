@@ -77,11 +77,11 @@ macro_rules! diag {
 macro_rules! diag_err {
     () => {{
         diag!("internal error at {}", diag_position!());
-        ::failure::Error::from(::DiagError::InternalError { pos: diag_position!() })
+        ::failure::Error::from(self::DiagError::InternalError { pos: diag_position!() })
     }};
     ($($arg:tt)+) => {{
         diag!($($arg)*);
-        ::failure::Error::from(::DiagError::InternalError { pos: diag_position!() })
+        ::failure::Error::from(self::DiagError::InternalError { pos: diag_position!() })
     }}
 }
 
@@ -90,7 +90,7 @@ macro_rules! diag_err {
 macro_rules! diag_err {
     () => {{
         diag!("internal error");
-        ::DiagError::InternalError { pos: diag_position!() }
+        self::DiagError::InternalError { pos: diag_position!() }
     }};
     ($($arg:tt)+) => {{
         diag!($($arg)*);
@@ -138,11 +138,11 @@ macro_rules! diag_unimplemented {
 macro_rules! diag_unimplemented_err {
     () => {{
         diag_unreachable!();
-        return Err(::DiagError::Unimplemented { pos: diag_position!() }.into());
+        return Err(self::DiagError::UnimplementedCodeReached { pos: diag_position!() }.into());
     }};
     ($($arg:tt)+) => {{
         diag_unreachable!($($arg)*);
-        return Err(::DiagError::Unimplemented { pos: diag_position!() }.into());
+        return Err(self::DiagError::UnimplementedCodeReached { pos: diag_position!() }.into());
     }}
 }
 
