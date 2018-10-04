@@ -20,6 +20,7 @@ fn logger() -> std::io::Result<()> {
     debug!("Hidden");
     info!("Info");
     error!("Error");
+    diag_err!("internal error");
     Ok(())
 }
 
@@ -28,4 +29,5 @@ fn logger() -> std::io::Result<()> {
 fn failure() {
     let e: failure::Error = DiagError::unimplemented(diag_position!()).into();
     error!("{}", e);
+    diag_err!();
 }

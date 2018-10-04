@@ -1,4 +1,6 @@
+#[cfg_attr(feature = "cargo-clippy", allow(useless_attribute))]
 #[macro_use]
+#[allow(unused_imports)]
 pub extern crate log;
 #[cfg(feature = "impl")]
 pub extern crate chrono;
@@ -35,6 +37,8 @@ pub enum DiagError {
     UnreachableCodeReached { pos: Position },
     #[cfg_attr(feature = "fail", fail(display = "unimplemented code reached at {}", pos))]
     UnimplementedCodeReached { pos: Position },
+    #[cfg_attr(feature = "fail", fail(display = "internal error at {}", pos))]
+    InternalError { pos: Position },
 }
 
 impl DiagError {
@@ -47,6 +51,9 @@ impl DiagError {
         DiagError::UnreachableCodeReached { pos }
     }
 
+    pub fn internal_error(pos: Position) -> Self {
+        DiagError::InternalError { pos }
+    }
 }
 
 #[macro_export]
@@ -63,6 +70,32 @@ macro_rules! diag_position {
 #[macro_export]
 macro_rules! diag {
     ($($arg:tt)+) => (error!(target: "diagnostics", $($arg)*));
+}
+
+#[cfg(feature = "fail")]
+#[macro_export]
+macro_rules! diag_err {
+    () => {{
+        diag!("internal error at {}", diag_position!());
+        ::failure::Error::from(::DiagError::InternalError { pos: diag_position!() })
+    }};
+    ($($arg:tt)+) => {{
+        diag!($($arg)*);
+        ::failure::Error::from(::DiagError::InternalError { pos: diag_position!() })
+    }}
+}
+
+#[cfg(not(feature = "fail"))]
+#[macro_export]
+macro_rules! diag_err {
+    () => {{
+        diag!("internal error");
+        ::DiagError::InternalError { pos: diag_position!() }
+    }};
+    ($($arg:tt)+) => {{
+        diag!($($arg)*);
+        ::DiagError::InternalError { pos: diag_position!() }
+    }}
 }
 
 #[macro_export]
