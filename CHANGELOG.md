@@ -1,17 +1,7 @@
-0.2.4
-=====
+0.2.2-0.2.5
+===========
 
 * Fixed macro name resolution
-
-0.2.3
-=====
-
-* Fixed few more macro name resolution problems
-
-0.2.2
-=====
-
-* Fixed diag_unimplemented_err macro
 
 0.2.1
 =====

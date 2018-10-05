@@ -114,11 +114,11 @@ macro_rules! diag_unreachable {
 macro_rules! diag_unreachable_err {
     () => {{
         diag_unreachable!();
-        return $crate::failure::Err($crate::DiagError::UnreachableCodeReached { pos: diag_position!() }.into());
+        return Err($crate::DiagError::UnreachableCodeReached { pos: diag_position!() }.into());
     }};
     ($($arg:tt)+) => {{
         diag_unreachable!($($arg)*);
-        return $crate::failure::Err($crate::DiagError::UnreachableCodeReached { pos: diag_position!() }.into());
+        return Err($crate::DiagError::UnreachableCodeReached { pos: diag_position!() }.into());
     }}
 }
 
