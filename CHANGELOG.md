@@ -1,3 +1,10 @@
+0.2.6
+=====
+
+* Added stdout_dispatch_with_target
+* Output position on diag_err
+* Output stack trace on diagnostics errors
+
 0.2.2-0.2.5
 ===========
 

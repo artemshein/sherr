@@ -11,6 +11,7 @@ pub extern crate failure;
 #[cfg(feature = "fail")]
 #[macro_use]
 pub extern crate failure_derive;
+pub extern crate backtrace;
 
 pub use log::*;
 
@@ -69,7 +70,16 @@ macro_rules! diag_position {
 
 #[macro_export]
 macro_rules! diag {
-    ($($arg:tt)+) => (error!(target: "diagnostics", $($arg)*));
+    ($($arg:tt)+) => {{
+        error!(target: "diagnostics", $($arg)*);
+    }};
+}
+
+#[macro_export]
+macro_rules! diag_backtrace {
+    () => {{
+        error!(target: "diagnostics", "{:?}", $crate::backtrace::Backtrace::new());
+    }}
 }
 
 #[cfg(feature = "fail")]
@@ -77,10 +87,13 @@ macro_rules! diag {
 macro_rules! diag_err {
     () => {{
         diag!("internal error at {}", diag_position!());
+        diag_backtrace!();
         $crate::failure::Error::from($crate::DiagError::InternalError { pos: diag_position!() })
     }};
     ($($arg:tt)+) => {{
+        diag!("internal error at {}", diag_position!());
         diag!($($arg)*);
+        diag_backtrace!();
         $crate::failure::Error::from($crate::DiagError::InternalError { pos: diag_position!() })
     }}
 }
@@ -89,10 +102,11 @@ macro_rules! diag_err {
 #[macro_export]
 macro_rules! diag_err {
     () => {{
-        diag!("internal error");
+        diag!("internal error at {}: {:?}", diag_position!(), $crate::backtrace::Backtrace::new());
         $crate::DiagError::InternalError { pos: diag_position!() }
     }};
     ($($arg:tt)+) => {{
+        diag!("internal error at {}: {:?}", diag_position!(), $crate::backtrace::Backtrace::new());
         diag!($($arg)*);
         $crate::DiagError::InternalError { pos: diag_position!() }
     }}
@@ -103,10 +117,12 @@ macro_rules! diag_unreachable {
     () => {{
         debug_assert!(false, "unreachable code reached");
         diag!("unreachable code reached at {}", diag_position!());
+        diag_backtrace!();
     }};
     ($($arg:tt)+) => {{
         debug_assert!(false, $($arg)*);
         diag!($($arg)*);
+        diag_backtrace!();
     }}
 }
 
@@ -127,10 +143,12 @@ macro_rules! diag_unimplemented {
     () => {{
         debug_assert!(false, "unimplemented code reached");
         diag!("unimplemented code reached at {}", diag_position!());
+        diag_backtrace!();
     }};
     ($($arg:tt)+) => {{
         debug_assert!(false, $($arg)*);
         diag!($($arg)*);
+        diag_backtrace!();
     }}
 }
 
@@ -148,6 +166,33 @@ macro_rules! diag_unimplemented_err {
 
 #[cfg(feature = "impl")]
 pub fn stdout_dispatch() -> fern::Dispatch {
+    use fern::colors::Color;
+    let colors = fern::colors::ColoredLevelConfig::new()
+        .trace(Color::White)
+        .debug(Color::Blue)
+        .info(Color::Green)
+        .warn(Color::Yellow)
+        .error(Color::Red);
+    fern::Dispatch::new()
+        .format(move |out, message, record| {
+            out.finish(format_args!(
+                "{} {}{}: {}",
+                chrono::Local::now().format("[%Y-%m-%d %H:%M:%S]"),
+                colors.color(record.level()),
+                if record.level() == log::Level::Info {
+                    " "
+                } else {
+                    ""
+                },
+                message,
+            ))
+        })
+        .level(log::LevelFilter::Info)
+        .level_for("diagnostics", log::LevelFilter::Off)
+}
+
+#[cfg(feature = "impl")]
+pub fn stdout_dispatch_with_target() -> fern::Dispatch {
     use fern::colors::Color;
     let colors = fern::colors::ColoredLevelConfig::new()
         .trace(Color::White)
