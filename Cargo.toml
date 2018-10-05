@@ -1,6 +1,6 @@
 [package]
 name = "sherr"
-version = "0.2.3"
+version = "0.2.4"
 authors = ["Artem Shein <artem.shein@aisys.ru>"]
 
 description = "Error handling and logging helpers"

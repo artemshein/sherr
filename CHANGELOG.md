@@ -1,3 +1,8 @@
+0.2.4
+=====
+
+* Fixed macro name resolution
+
 0.2.3
 =====
 
