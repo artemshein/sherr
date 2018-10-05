@@ -1,3 +1,8 @@
+0.2.7
+=====
+
+* Fixed waring message formatting
+
 0.2.6
 =====
 

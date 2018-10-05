@@ -19,6 +19,7 @@ fn logger() -> std::io::Result<()> {
     diag!("To file");
     debug!("Hidden");
     info!("Info");
+    warn!("Warn");
     error!("Error");
     diag_err!("internal error");
     Ok(())

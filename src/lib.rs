@@ -179,7 +179,7 @@ pub fn stdout_dispatch() -> fern::Dispatch {
                 "{} {}{}: {}",
                 chrono::Local::now().format("[%Y-%m-%d %H:%M:%S]"),
                 colors.color(record.level()),
-                if record.level() == log::Level::Info {
+                if record.level() == log::Level::Info || record.level() == log::Level::Warn {
                     " "
                 } else {
                     ""
@@ -206,7 +206,7 @@ pub fn stdout_dispatch_with_target() -> fern::Dispatch {
                 "{} {}{} {}: {}",
                 chrono::Local::now().format("[%Y-%m-%d %H:%M:%S]"),
                 colors.color(record.level()),
-                if record.level() == log::Level::Info {
+                if record.level() == log::Level::Info || record.level() == log::Level::Warn {
                     " "
                 } else {
                     ""
