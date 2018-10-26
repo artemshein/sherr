@@ -1,5 +1,4 @@
 #[cfg_attr(feature = "cargo-clippy", allow(useless_attribute))]
-#[macro_use]
 #[allow(unused_imports)]
 pub extern crate log;
 #[cfg(feature = "impl")]
@@ -9,7 +8,6 @@ pub extern crate fern;
 #[cfg(feature = "fail")]
 pub extern crate failure;
 #[cfg(feature = "fail")]
-#[macro_use]
 pub extern crate failure_derive;
 pub extern crate backtrace;
 

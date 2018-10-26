@@ -1,3 +1,8 @@
+0.2.8
+=====
+
+* Switch to new `use macro` syntax
+
 0.2.7
 =====
 

@@ -1,4 +1,4 @@
-use super::*;
+use crate::*;
 
 #[test]
 #[should_panic]
