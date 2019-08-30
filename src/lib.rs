@@ -1,15 +1,17 @@
 #[cfg_attr(feature = "cargo-clippy", allow(useless_attribute))]
 #[allow(unused_imports)]
-pub extern crate log;
+pub use log;
 #[cfg(feature = "impl")]
-pub extern crate chrono;
+pub use chrono;
 #[cfg(feature = "impl")]
-pub extern crate fern;
+pub use fern;
+#[cfg(feature = "impl")]
+pub use libc;
 #[cfg(feature = "fail")]
-pub extern crate failure;
+pub use failure;
 #[cfg(feature = "fail")]
-pub extern crate failure_derive;
-pub extern crate backtrace;
+pub use failure_derive;
+pub use backtrace;
 
 pub use log::*;
 
@@ -163,6 +165,12 @@ macro_rules! diag_unimplemented_err {
 }
 
 #[cfg(feature = "impl")]
+pub fn is_stdout_a_tty() -> bool {
+    let result = unsafe { libc::isatty(libc::STDOUT_FILENO as i32) } != 0;
+    result
+}
+
+#[cfg(feature = "impl")]
 pub fn stdout_dispatch() -> fern::Dispatch {
     use fern::colors::Color;
     let colors = fern::colors::ColoredLevelConfig::new()
@@ -171,12 +179,13 @@ pub fn stdout_dispatch() -> fern::Dispatch {
         .info(Color::Green)
         .warn(Color::Yellow)
         .error(Color::Red);
+    let is_a_tty = is_stdout_a_tty();
     fern::Dispatch::new()
         .format(move |out, message, record| {
             out.finish(format_args!(
                 "{} {}{}: {}",
                 chrono::Local::now().format("[%Y-%m-%d %H:%M:%S]"),
-                colors.color(record.level()),
+                if is_a_tty { format!("{}", colors.color(record.level())) } else { format!("{}", record.level()) },
                 if record.level() == log::Level::Info || record.level() == log::Level::Warn {
                     " "
                 } else {

@@ -1,3 +1,8 @@
+0.2.9
+=====
+
+* Activate colored logging when it is a terminal
+
 0.2.8
 =====
 

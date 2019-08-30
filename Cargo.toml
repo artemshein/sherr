@@ -1,7 +1,8 @@
 [package]
 name = "sherr"
-version = "0.2.8"
+version = "0.2.9"
 authors = ["Artem Shein <artem.shein@aisys.ru>"]
+edition = "2018"
 
 description = "Error handling and logging helpers"
 repository = "https://github.com/artemshein/sherr"
@@ -9,6 +10,7 @@ categories = ["development-tools"]
 license = "MIT"
 
 [dependencies]
+libc = { version = "0.2.62", optional = true }
 log = "0.4"
 fern = { version = "0.5", features = ["colored"], optional = true }
 chrono = { version = "0.4", optional = true }
@@ -18,5 +20,5 @@ backtrace = "0.3"
 
 [features]
 default = []
-impl = ["fern", "chrono"]
+impl = ["fern", "chrono", "libc"]
 fail = ["failure", "failure_derive"]
