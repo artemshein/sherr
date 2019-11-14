@@ -1,3 +1,8 @@
+0.2.10
+======
+
+* Fix is_a_tty check on Windows
+
 0.2.9
 =====
 
