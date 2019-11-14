@@ -1,6 +1,6 @@
 [package]
 name = "sherr"
-version = "0.2.9"
+version = "0.2.10"
 authors = ["Artem Shein <artem.shein@aisys.ru>"]
 edition = "2018"
 
@@ -17,8 +17,9 @@ chrono = { version = "0.4", optional = true }
 failure = { version = "0.1", optional = true }
 failure_derive = { version = "0.1", optional = true }
 backtrace = "0.3"
+atty = { version = "0.2.13", optional = true }
 
 [features]
 default = []
-impl = ["fern", "chrono", "libc"]
+impl = ["fern", "chrono", "libc", "atty"]
 fail = ["failure", "failure_derive"]

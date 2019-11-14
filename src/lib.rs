@@ -1,17 +1,17 @@
-#[cfg_attr(feature = "cargo-clippy", allow(useless_attribute))]
-#[allow(unused_imports)]
-pub use log;
+pub use backtrace;
 #[cfg(feature = "impl")]
 pub use chrono;
-#[cfg(feature = "impl")]
-pub use fern;
-#[cfg(feature = "impl")]
-pub use libc;
 #[cfg(feature = "fail")]
 pub use failure;
 #[cfg(feature = "fail")]
 pub use failure_derive;
-pub use backtrace;
+#[cfg(feature = "impl")]
+pub use fern;
+#[cfg(feature = "impl")]
+pub use libc;
+#[cfg_attr(feature = "cargo-clippy", allow(useless_attribute))]
+#[allow(unused_imports)]
+pub use log;
 
 pub use log::*;
 
@@ -34,16 +34,21 @@ impl std::fmt::Display for Position {
 #[derive(Debug)]
 #[cfg_attr(feature = "fail", derive(Fail))]
 pub enum DiagError {
-    #[cfg_attr(feature = "fail", fail(display = "unreachable code reached at {}", pos))]
+    #[cfg_attr(
+        feature = "fail",
+        fail(display = "unreachable code reached at {}", pos)
+    )]
     UnreachableCodeReached { pos: Position },
-    #[cfg_attr(feature = "fail", fail(display = "unimplemented code reached at {}", pos))]
+    #[cfg_attr(
+        feature = "fail",
+        fail(display = "unimplemented code reached at {}", pos)
+    )]
     UnimplementedCodeReached { pos: Position },
     #[cfg_attr(feature = "fail", fail(display = "internal error at {}", pos))]
     InternalError { pos: Position },
 }
 
 impl DiagError {
-
     pub fn unimplemented(pos: Position) -> Self {
         DiagError::UnimplementedCodeReached { pos }
     }
@@ -165,12 +170,6 @@ macro_rules! diag_unimplemented_err {
 }
 
 #[cfg(feature = "impl")]
-pub fn is_stdout_a_tty() -> bool {
-    let result = unsafe { libc::isatty(libc::STDOUT_FILENO as i32) } != 0;
-    result
-}
-
-#[cfg(feature = "impl")]
 pub fn stdout_dispatch() -> fern::Dispatch {
     use fern::colors::Color;
     let colors = fern::colors::ColoredLevelConfig::new()
@@ -179,13 +178,16 @@ pub fn stdout_dispatch() -> fern::Dispatch {
         .info(Color::Green)
         .warn(Color::Yellow)
         .error(Color::Red);
-    let is_a_tty = is_stdout_a_tty();
     fern::Dispatch::new()
         .format(move |out, message, record| {
             out.finish(format_args!(
                 "{} {}{}: {}",
                 chrono::Local::now().format("[%Y-%m-%d %H:%M:%S]"),
-                if is_a_tty { format!("{}", colors.color(record.level())) } else { format!("{}", record.level()) },
+                if atty::is(atty::Stream::Stdout) {
+                    format!("{}", colors.color(record.level()))
+                } else {
+                    format!("{}", record.level())
+                },
                 if record.level() == log::Level::Info || record.level() == log::Level::Warn {
                     " "
                 } else {
@@ -248,7 +250,9 @@ pub fn diag_dispatch() -> fern::Dispatch {
 }
 
 #[cfg(feature = "impl")]
-pub fn init_logger(log_file: Option<impl AsRef<std::path::Path>>) -> std::io::Result<fern::Dispatch> {
+pub fn init_logger(
+    log_file: Option<impl AsRef<std::path::Path>>,
+) -> std::io::Result<fern::Dispatch> {
     let mut dispatch = fern::Dispatch::new().chain(stdout_dispatch().chain(std::io::stdout()));
     let log_file = if let Some(log_file) = log_file {
         Some(log_file.as_ref().to_owned())
