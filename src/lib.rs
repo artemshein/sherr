@@ -1,10 +1,6 @@
 pub use backtrace;
 #[cfg(feature = "impl")]
 pub use chrono;
-#[cfg(feature = "fail")]
-pub use failure;
-#[cfg(feature = "fail")]
-pub use failure_derive;
 #[cfg(feature = "impl")]
 pub use fern;
 #[cfg(feature = "impl")]
@@ -14,9 +10,8 @@ pub use libc;
 pub use log;
 
 pub use log::*;
-
-#[cfg(feature = "fail")]
-pub use failure_derive::*;
+pub use anyhow::*;
+pub use anyhow;
 
 #[derive(Debug)]
 pub struct Position {
@@ -28,37 +23,6 @@ pub struct Position {
 impl std::fmt::Display for Position {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         write!(f, "{}:{}:{}", self.file, self.line, self.column)
-    }
-}
-
-#[derive(Debug)]
-#[cfg_attr(feature = "fail", derive(Fail))]
-pub enum DiagError {
-    #[cfg_attr(
-        feature = "fail",
-        fail(display = "unreachable code reached at {}", pos)
-    )]
-    UnreachableCodeReached { pos: Position },
-    #[cfg_attr(
-        feature = "fail",
-        fail(display = "unimplemented code reached at {}", pos)
-    )]
-    UnimplementedCodeReached { pos: Position },
-    #[cfg_attr(feature = "fail", fail(display = "internal error at {}", pos))]
-    InternalError { pos: Position },
-}
-
-impl DiagError {
-    pub fn unimplemented(pos: Position) -> Self {
-        DiagError::UnimplementedCodeReached { pos }
-    }
-
-    pub fn unreachable(pos: Position) -> Self {
-        DiagError::UnreachableCodeReached { pos }
-    }
-
-    pub fn internal_error(pos: Position) -> Self {
-        DiagError::InternalError { pos }
     }
 }
 
@@ -87,33 +51,18 @@ macro_rules! diag_backtrace {
     }}
 }
 
-#[cfg(feature = "fail")]
 #[macro_export]
 macro_rules! diag_err {
     () => {{
         diag!("internal error at {}", diag_position!());
         diag_backtrace!();
-        $crate::failure::Error::from($crate::DiagError::InternalError { pos: diag_position!() })
+        $crate::anyhow::anyhow!("internal error")
     }};
     ($($arg:tt)+) => {{
         diag!("internal error at {}", diag_position!());
         diag!($($arg)*);
         diag_backtrace!();
-        $crate::failure::Error::from($crate::DiagError::InternalError { pos: diag_position!() })
-    }}
-}
-
-#[cfg(not(feature = "fail"))]
-#[macro_export]
-macro_rules! diag_err {
-    () => {{
-        diag!("internal error at {}: {:?}", diag_position!(), $crate::backtrace::Backtrace::new());
-        $crate::DiagError::InternalError { pos: diag_position!() }
-    }};
-    ($($arg:tt)+) => {{
-        diag!("internal error at {}: {:?}", diag_position!(), $crate::backtrace::Backtrace::new());
-        diag!($($arg)*);
-        $crate::DiagError::InternalError { pos: diag_position!() }
+        $crate::anyhow::anyhow!($($arg)*)
     }}
 }
 
@@ -135,11 +84,11 @@ macro_rules! diag_unreachable {
 macro_rules! diag_unreachable_err {
     () => {{
         diag_unreachable!();
-        return Err($crate::DiagError::UnreachableCodeReached { pos: diag_position!() }.into());
+        $crate::anyhow::anyhow!("unreachable code reached at {}", diag_position!())
     }};
     ($($arg:tt)+) => {{
         diag_unreachable!($($arg)*);
-        return Err($crate::DiagError::UnreachableCodeReached { pos: diag_position!() }.into());
+        $crate::anyhow::anyhow!($($arg)*)
     }}
 }
 
@@ -161,11 +110,11 @@ macro_rules! diag_unimplemented {
 macro_rules! diag_unimplemented_err {
     () => {{
         diag_unreachable!();
-        return Err($crate::DiagError::UnimplementedCodeReached { pos: diag_position!() }.into());
+        $crate::anyhow::anyhow!("unimplemented code reached at {}", diag_position!())
     }};
     ($($arg:tt)+) => {{
         diag_unreachable!($($arg)*);
-        return Err($crate::DiagError::UnimplementedCodeReached { pos: diag_position!() }.into());
+        $crate::anyhow::anyhow!($($arg)*)
     }}
 }
 

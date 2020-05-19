@@ -1,3 +1,10 @@
+0.3.0
+=====
+
+* Switch to anyhow from failure
+* Remove fail feature
+* Major API overhaul
+
 0.2.10
 ======
 
