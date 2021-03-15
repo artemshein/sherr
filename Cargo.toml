@@ -1,6 +1,6 @@
 [package]
 name = "sherr"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Artem Shein <artem.shein@aisys.ru>"]
 edition = "2018"
 
@@ -14,7 +14,7 @@ libc = { version = "0.2.62", optional = true }
 log = "0.4"
 fern = { version = "0.6", features = ["colored"], optional = true }
 chrono = { version = "0.4", optional = true }
-anyhow = "1.0.31"
+anyhow = "1.0"
 backtrace = "0.3"
 atty = { version = "0.2.13", optional = true }
 

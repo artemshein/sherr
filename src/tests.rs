@@ -36,6 +36,16 @@ fn diag_unimplemented_err_msg() {
     let _ = diag_unimplemented_err!("message {}", "here");
 }
 
+#[test]
+fn bail_diag() {
+    assert!((|| -> Result<(), Error> {
+        if true {
+            bail_diag!("should return error");
+        }
+        Ok(())
+    })().is_err());
+}
+
 #[cfg(feature = "impl")]
 #[test]
 fn logger() -> Result<()> {

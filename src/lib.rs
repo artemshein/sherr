@@ -67,6 +67,21 @@ macro_rules! diag_err {
 }
 
 #[macro_export]
+macro_rules! bail_diag {
+    () => {{
+        diag!("internal error at {}", diag_position!());
+        diag_backtrace!();
+        $crate::anyhow::bail!("internal error");
+    }};
+    ($($arg:tt)+) => {{
+        diag!("internal error at {}", diag_position!());
+        diag!($($arg)*);
+        diag_backtrace!();
+        $crate::anyhow::bail!($($arg)*);
+    }}
+}
+
+#[macro_export]
 macro_rules! diag_unreachable {
     () => {{
         debug_assert!(false, "unreachable code reached");
