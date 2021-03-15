@@ -99,7 +99,7 @@ macro_rules! diag_unreachable {
 macro_rules! diag_unreachable_err {
     () => {{
         $crate::diag_unreachable!();
-        $crate::anyhow::anyhow!("unreachable code reached at {}", diag_position!())
+        $crate::anyhow::anyhow!("unreachable code reached at {}", $crate::diag_position!())
     }};
     ($($arg:tt)+) => {{
         $crate::diag_unreachable!($($arg)*);
@@ -111,7 +111,7 @@ macro_rules! diag_unreachable_err {
 macro_rules! diag_unimplemented {
     () => {{
         debug_assert!(false, "unimplemented code reached");
-        $crate::diag!("unimplemented code reached at {}", diag_position!());
+        $crate::diag!("unimplemented code reached at {}", $crate::diag_position!());
         $crate::diag_backtrace!();
     }};
     ($($arg:tt)+) => {{
