@@ -46,6 +46,22 @@ fn bail_diag() {
     })().is_err());
 }
 
+#[test]
+fn throw() {
+    assert!((|| -> Result<(), Error> {
+        if true {
+            throw!(diag_err!("should return error"));
+        }
+        Ok(())
+    })().is_err());
+    assert!((|| -> Option<()> {
+        if true {
+            throw!();
+        }
+        Some(())
+    })().is_none());
+}
+
 #[cfg(feature = "impl")]
 #[test]
 fn logger() -> Result<()> {

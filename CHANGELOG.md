@@ -1,7 +1,13 @@
+0.4.0
+=====
+
+* Added throw!
+* Add implicit imports
+
 0.3.1
 =====
 
-* Add bail_diag!
+* Added bail_diag!
 
 0.3.0
 =====

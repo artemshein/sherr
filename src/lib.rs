@@ -47,21 +47,21 @@ macro_rules! diag {
 #[macro_export]
 macro_rules! diag_backtrace {
     () => {{
-        error!(target: "diagnostics", "{:?}", $crate::backtrace::Backtrace::new());
+        $crate::error!(target: "diagnostics", "{:?}", $crate::backtrace::Backtrace::new());
     }}
 }
 
 #[macro_export]
 macro_rules! diag_err {
     () => {{
-        diag!("internal error at {}", diag_position!());
-        diag_backtrace!();
+        $crate::diag!("internal error at {}", $crate::diag_position!());
+        $crate::diag_backtrace!();
         $crate::anyhow::anyhow!("internal error")
     }};
     ($($arg:tt)+) => {{
-        diag!("internal error at {}", diag_position!());
-        diag!($($arg)*);
-        diag_backtrace!();
+        $crate::diag!("internal error at {}", $crate::diag_position!());
+        $crate::diag!($($arg)*);
+        $crate::diag_backtrace!();
         $crate::anyhow::anyhow!($($arg)*)
     }}
 }
@@ -69,14 +69,14 @@ macro_rules! diag_err {
 #[macro_export]
 macro_rules! bail_diag {
     () => {{
-        diag!("internal error at {}", diag_position!());
-        diag_backtrace!();
+        $crate::diag!("internal error at {}", $crate::diag_position!());
+        $crate::diag_backtrace!();
         $crate::anyhow::bail!("internal error");
     }};
     ($($arg:tt)+) => {{
-        diag!("internal error at {}", diag_position!());
-        diag!($($arg)*);
-        diag_backtrace!();
+        $crate::diag!("internal error at {}", $crate::diag_position!());
+        $crate::diag!($($arg)*);
+        $crate::diag_backtrace!();
         $crate::anyhow::bail!($($arg)*);
     }}
 }
@@ -85,24 +85,24 @@ macro_rules! bail_diag {
 macro_rules! diag_unreachable {
     () => {{
         debug_assert!(false, "unreachable code reached");
-        diag!("unreachable code reached at {}", diag_position!());
-        diag_backtrace!();
+        $crate::diag!("unreachable code reached at {}", $crate::diag_position!());
+        $crate::diag_backtrace!();
     }};
     ($($arg:tt)+) => {{
         debug_assert!(false, $($arg)*);
-        diag!($($arg)*);
-        diag_backtrace!();
+        $crate::diag!($($arg)*);
+        $crate::diag_backtrace!();
     }}
 }
 
 #[macro_export]
 macro_rules! diag_unreachable_err {
     () => {{
-        diag_unreachable!();
+        $crate::diag_unreachable!();
         $crate::anyhow::anyhow!("unreachable code reached at {}", diag_position!())
     }};
     ($($arg:tt)+) => {{
-        diag_unreachable!($($arg)*);
+        $crate::diag_unreachable!($($arg)*);
         $crate::anyhow::anyhow!($($arg)*)
     }}
 }
@@ -111,25 +111,35 @@ macro_rules! diag_unreachable_err {
 macro_rules! diag_unimplemented {
     () => {{
         debug_assert!(false, "unimplemented code reached");
-        diag!("unimplemented code reached at {}", diag_position!());
-        diag_backtrace!();
+        $crate::diag!("unimplemented code reached at {}", diag_position!());
+        $crate::diag_backtrace!();
     }};
     ($($arg:tt)+) => {{
         debug_assert!(false, $($arg)*);
-        diag!($($arg)*);
-        diag_backtrace!();
+        $crate::diag!($($arg)*);
+        $crate::diag_backtrace!();
     }}
 }
 
 #[macro_export]
 macro_rules! diag_unimplemented_err {
     () => {{
-        diag_unreachable!();
-        $crate::anyhow::anyhow!("unimplemented code reached at {}", diag_position!())
+        $crate::diag_unreachable!();
+        $crate::anyhow::anyhow!("unimplemented code reached at {}", $crate::diag_position!())
     }};
     ($($arg:tt)+) => {{
-        diag_unreachable!($($arg)*);
+        $crate::diag_unreachable!($($arg)*);
         $crate::anyhow::anyhow!($($arg)*)
+    }}
+}
+
+#[macro_export]
+macro_rules! throw {
+    () => {{
+        return None;
+    }};
+    ($($arg:tt)+) => {{
+        return Err($($arg)*);
     }}
 }
 
