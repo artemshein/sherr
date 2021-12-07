@@ -1,8 +1,8 @@
 [package]
 name = "sherr"
-version = "0.4.1"
+version = "0.4.2"
 authors = ["Artem Shein <artem.shein@aisys.ru>"]
-edition = "2018"
+edition = "2021"
 
 description = "Error signalling and logging helpers"
 repository = "https://github.com/artemshein/sherr"
