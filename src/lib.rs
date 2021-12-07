@@ -10,8 +10,7 @@ pub use libc;
 pub use log;
 
 pub use log::*;
-pub use anyhow::*;
-pub use anyhow;
+pub use anyhow::{self, Error, Result, Context, Chain, format_err, ensure, bail};
 
 #[derive(Debug)]
 pub struct Position {

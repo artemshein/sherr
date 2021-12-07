@@ -1,3 +1,8 @@
+0.4.3
+=====
+
+* Fix imports for anyhow
+
 0.4.2
 =====
 
