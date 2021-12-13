@@ -39,7 +39,7 @@ macro_rules! diag_position {
 #[macro_export]
 macro_rules! diag {
     ($($arg:tt)+) => {{
-        error!(target: "diagnostics", $($arg)*);
+        $crate::error!(target: "diagnostics", $($arg)*);
     }};
 }
 
@@ -129,16 +129,6 @@ macro_rules! diag_unimplemented_err {
     ($($arg:tt)+) => {{
         $crate::diag_unreachable!($($arg)*);
         $crate::anyhow::anyhow!($($arg)*)
-    }}
-}
-
-#[macro_export]
-macro_rules! throw {
-    () => {{
-        return None;
-    }};
-    ($($arg:tt)+) => {{
-        return Err($($arg)*);
     }}
 }
 

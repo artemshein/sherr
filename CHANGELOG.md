@@ -1,3 +1,9 @@
+0.5.0
+=====
+
+* Removed throw macro
+* Fix more imports for anyhow
+
 0.4.3
 =====
 

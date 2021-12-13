@@ -1,6 +1,6 @@
 [package]
 name = "sherr"
-version = "0.4.3"
+version = "0.5.0"
 authors = ["Artem Shein <artem.shein@aisys.ru>"]
 edition = "2021"
 
