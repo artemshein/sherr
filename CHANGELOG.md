@@ -1,3 +1,8 @@
+0.5.2
+=====
+
+* Fixes bug with PathBuf
+
 0.5.1
 =====
 
