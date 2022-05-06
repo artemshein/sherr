@@ -1,3 +1,8 @@
+0.5.1
+=====
+
+* Include only file name, but not path in diag_position
+
 0.5.0
 =====
 

@@ -10,11 +10,13 @@ pub use libc;
 pub use log;
 
 pub use log::*;
+pub use std::path::PathBuf;
+pub use std::borrow::Cow;
 pub use anyhow::{self, Error, Result, Context, Chain, format_err, ensure, bail};
 
 #[derive(Debug)]
 pub struct Position {
-    pub file: &'static str,
+    pub file: String,
     pub line: u32,
     pub column: u32,
 }
@@ -29,7 +31,7 @@ impl std::fmt::Display for Position {
 macro_rules! diag_position {
     () => {{
         $crate::Position {
-            file: file!(),
+            file: PathBuf::from(file!()).file_name().unwrap().to_string_lossy().to_string(),
             line: line!(),
             column: column!(),
         }
